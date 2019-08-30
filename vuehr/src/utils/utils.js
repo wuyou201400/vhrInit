@@ -12,6 +12,7 @@ export const isNotNullORBlank = (...args)=> {
   return true;
 }
 export const initMenu = (router, store)=> {
+  debugger
   if (store.state.routes.length > 0) {
     return;
   }

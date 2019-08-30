@@ -59,6 +59,7 @@
 <script>
   export default{
     mounted: function () {
+      debugger
 //      this.devMsg();
       this.loadNF();
     },

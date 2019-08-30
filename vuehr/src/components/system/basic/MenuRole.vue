@@ -51,6 +51,7 @@
   import {isNotNullORBlank} from '../../../utils/utils'
   export default{
     mounted: function () {
+      debugger
       this.loading = true;
       this.initRoles();
     },

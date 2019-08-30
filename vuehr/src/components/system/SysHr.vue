@@ -96,6 +96,7 @@
       }
     },
     mounted: function () {
+      debugger
       this.initCards();
       this.loadAllRoles();
     },

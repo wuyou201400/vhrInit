@@ -35,6 +35,7 @@
     },
     methods: {
       submitClick: function () {
+        debugger
         var _this = this;
         this.loading = true;
         this.postRequest('/login', {

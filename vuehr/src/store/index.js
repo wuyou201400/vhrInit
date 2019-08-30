@@ -22,37 +22,47 @@ export default new Vuex.Store({
   },
   mutations: {
     initMenu(state, menus){
+      debugger
       state.routes = menus;
     },
     login(state, user){
+      debugger
       state.user = user;
       window.localStorage.setItem('user', JSON.stringify(user));
     },
     logout(state){
+      debugger
       window.localStorage.removeItem('user');
       state.routes = [];
     },
     toggleNFDot(state, newValue){
+      debugger
       state.nfDot = newValue;
     },
     updateMsgList(state, newMsgList){
+      debugger
       state.msgList = newMsgList;
     },
     updateCurrentFriend(state, newFriend){
+      debugger
       state.currentFriend = newFriend;
     },
     addValue2DotMap(state, key){
+      debugger
       state.isDotMap.set(key, "您有未读消息")
     },
     removeValueDotMap(state, key){
+      debugger
       state.isDotMap.delete(key);
     }
   },
   actions: {
     connect(context){
+      debugger
       context.state.stomp = Stomp.over(new SockJS("/ws/endpointChat"));
       context.state.stomp.connect({}, frame=> {
         context.state.stomp.subscribe("/user/queue/chat", message=> {
+          debugger
           var msg = JSON.parse(message.body);
           var oldMsg = window.localStorage.getItem(context.state.user.username + "#" + msg.from);
           if (oldMsg == null) {
@@ -76,6 +86,7 @@ export default new Vuex.Store({
           }
         });
         context.state.stomp.subscribe("/topic/nf", message=> {
+          debugger
           context.commit('toggleNFDot', true);
         });
       }, failedMsg=> {
