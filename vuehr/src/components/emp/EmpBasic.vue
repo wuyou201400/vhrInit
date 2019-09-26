@@ -9,12 +9,12 @@
             @change="keywordsChange"
             style="width: 300px;margin: 0px;padding: 0px;"
             size="mini"
-            :disabled="advanceSearchViewVisible"
+            v-show="!advanceSearchViewVisible"
             @keyup.enter.native="searchEmp"
             prefix-icon="el-icon-search"
             v-model="keywords">
           </el-input>
-          <el-button type="primary" size="mini" style="margin-left: 5px" icon="el-icon-search" @click="searchEmp">搜索
+          <el-button type="primary" size="mini" style="margin-left: 5px" icon="el-icon-search" @click="searchEmp" v-show="!advanceSearchViewVisible">搜索
           </el-button>
           <el-button slot="reference" type="primary" size="mini" style="margin-left: 5px"
                      @click="showAdvanceSearchView"><i
@@ -38,7 +38,7 @@
                                                                        style="margin-right: 5px"></i>导出数据
           </el-button>
           <el-button type="primary" size="mini" icon="el-icon-plus"
-                     @click="showAddEmpView">
+                     @click="showAddDialog">
             添加员工
           </el-button>
         </div>
@@ -279,7 +279,7 @@
               label="操作"
               width="195">
               <template slot-scope="scope">
-                <el-button @click="showEditEmpView(scope.row)" style="padding: 3px 4px 3px 4px;margin: 2px"
+                <el-button @click="showEditDialog(scope.row)" style="padding: 3px 4px 3px 4px;margin: 2px"
                            size="mini">编辑
                 </el-button>
                 <el-button style="padding: 3px 4px 3px 4px;margin: 2px" type="primary"
@@ -297,17 +297,20 @@
             </el-button>
             <el-pagination
               background
-              :page-size="10"
+              :page-size="pageSize"
+              :pager-count="10"
+              :page-sizes="[10, 20, 30, 40,50]"
+              @size-change="handleSizeChange"
               :current-page="currentPage"
-              @current-change="currentChange"
-              layout="prev, pager, next"
+              @current-change="handleCurrentChange"
+              layout="total,sizes, prev, pager, next,jumper"
               :total="totalCount">
             </el-pagination>
           </div>
         </div>
       </el-main>
     </el-container>
-    <el-form :model="emp" :rules="rules" ref="addEmpForm" style="margin: 0px;padding: 0px;">
+    <el-form :model="emp" :rules="rules" ref="addOrEditForm" style="margin: 0px;padding: 0px;">
       <div style="text-align: left">
         <el-dialog
           :title="dialogTitle"
@@ -508,6 +511,8 @@
                     style="width: 130px"
                     type="date"
                     value-format="yyyy-MM-dd HH:mm:ss"
+                    format="yyyy年MM月dd日"
+                    :picker-options="pickerOptions"
                     placeholder="入职日期">
                   </el-date-picker>
                 </el-form-item>
@@ -589,7 +594,7 @@
           </el-row>
           <span slot="footer" class="dialog-footer">
     <el-button size="mini" @click="cancelEidt">取 消</el-button>
-    <el-button size="mini" type="primary" @click="addEmp('addEmpForm')">确 定</el-button>
+    <el-button size="mini" type="primary" @click="doAddOrEdit('addOrEditForm')">确 定</el-button>
   </span>
         </el-dialog>
       </div>
@@ -613,6 +618,7 @@
         politics: [],
         positions: [],
         joblevels: [],
+        pageSize:10,
         totalCount: -1,
         currentPage: 1,
         degrees: [{id: 4, name: '大专'}, {id: 5, name: '本科'}, {id: 6, name: '硕士'}, {id: 7, name: '博士'}, {
@@ -697,10 +703,35 @@
           beginContract: [{required: true, message: '必填:合同起始日期', trigger: 'blur'}],
           endContract: [{required: true, message: '必填:合同终止日期', trigger: 'blur'}],
           workAge: [{required: true, message: '必填:工龄', trigger: 'blur'}]
+        },
+        pickerOptions: {
+          shortcuts: [
+            {
+              text: '今天',
+              onClick(picker) {
+                picker.$emit('pick', new Date())
+              }
+            }, {
+              text: '昨天',
+              onClick(picker) {
+                const date = new Date();
+                date.setTime(date.getTime() - 3600 * 1000 * 24);
+                picker.$emit('pick', date);
+              }
+            }, {
+              text: '一周前',
+              onClick(picker) {
+                const date = new Date();
+                date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                picker.$emit('pick', date);
+              }
+            }
+          ]
         }
       };
     },
     mounted: function () {
+      debugger
       this.initData();
       this.loadEmps();
     },
@@ -784,14 +815,19 @@
       searchEmp() {
         this.loadEmps();
       },
-      currentChange(currentChange) {
-        this.currentPage = currentChange;
+      handleCurrentChange(val) {
+        this.currentPage = val;
+        this.loadEmps();
+      },
+      handleSizeChange(val){
+        this.pageSize = val;
+        this.currentPage=1;
         this.loadEmps();
       },
       loadEmps() {
         var _this = this;
         this.tableLoading = true;
-        this.getRequest("/employee/basic/emp?page=" + this.currentPage + "&size=10&keywords=" + this.keywords + "&politicId=" + this.emp.politicId + "&nationId=" + this.emp.nationId + "&posId=" + this.emp.posId + "&jobLevelId=" + this.emp.jobLevelId + "&engageForm=" + this.emp.engageForm + "&departmentId=" + this.emp.departmentId + "&beginDateScope=" + this.beginDateScope).then(resp => {
+        this.getRequest("/employee/basic/emp?page=" + this.currentPage + "&size="+this.pageSize+"&keywords=" + this.keywords + "&politicId=" + this.emp.politicId + "&nationId=" + this.emp.nationId + "&posId=" + this.emp.posId + "&jobLevelId=" + this.emp.jobLevelId + "&engageForm=" + this.emp.engageForm + "&departmentId=" + this.emp.departmentId + "&beginDateScope=" + this.beginDateScope).then(resp => {
           this.tableLoading = false;
           if (resp && resp.status == 200) {
             var data = resp.data;
@@ -801,7 +837,7 @@
           }
         })
       },
-      addEmp(formName) {
+      doAddOrEdit(formName) {
         var _this = this;
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -872,8 +908,7 @@
           }
         })
       },
-      showEditEmpView(row) {
-        console.log(row)
+      showEditDialog(row) {
         this.dialogTitle = "编辑员工";
         this.emp = row;
         this.emp.birthday = this.formatDate(row.birthday);
@@ -898,7 +933,7 @@
         this.dialogVisible = true;
         console.log(this.emp)
       },
-      showAddEmpView() {
+      showAddDialog() {
         this.dialogTitle = "添加员工";
         this.dialogVisible = true;
         var _this = this;

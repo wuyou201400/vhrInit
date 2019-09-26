@@ -30,6 +30,11 @@ public class MenuService {
         return menuMapper.getMenusByHrId(HrUtils.getCurrentHr().getId());
     }
 
+    public List<Menu> getMenusByHrIdTree() {
+        return menuMapper.getMenusByHrIdTree(HrUtils.getCurrentHr().getId());
+    }
+
+
     public List<Menu> menuTree() {
         return menuMapper.menuTree();
     }

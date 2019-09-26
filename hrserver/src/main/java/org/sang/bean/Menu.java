@@ -20,6 +20,7 @@ public class Menu implements Serializable {
     private List<Role> roles;
     private List<Menu> children;
     private MenuMeta meta;
+    private boolean enabled;
 
     public MenuMeta getMeta() {
         return meta;
@@ -103,5 +104,13 @@ public class Menu implements Serializable {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

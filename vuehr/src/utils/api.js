@@ -1,14 +1,12 @@
 import axios from 'axios'
 import {Message} from 'element-ui'
 axios.interceptors.request.use(config => {
-  debugger
   return config;
 }, err => {
   Message.error({message: '请求超时!'});
   // return Promise.resolve(err);
 })
 axios.interceptors.response.use(data => {
-  debugger
   if (data.status && data.status == 200 && data.data.status == 500) {
     Message.error({message: data.data.msg});
     return;
@@ -20,7 +18,8 @@ axios.interceptors.response.use(data => {
 }, err => {
   debugger
   if(err.response==undefined){
-    Message.error({message: '未知错误'});
+    Message.error({message: '登录超时'});
+    location.href='/';
   }
   else if (err.response.status == 504 || err.response.status == 404) {
     Message.error({message: '服务器被吃了⊙﹏⊙∥'});

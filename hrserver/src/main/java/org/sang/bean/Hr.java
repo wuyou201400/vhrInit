@@ -24,6 +24,8 @@ public class Hr implements UserDetails {
     private String remark;
     private List<Role> roles;
     private String userface;
+    private String email;
+
     @Override
     public boolean isEnabled() {
         return enabled;
@@ -137,5 +139,13 @@ public class Hr implements UserDetails {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

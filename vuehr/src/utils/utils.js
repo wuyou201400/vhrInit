@@ -12,7 +12,6 @@ export const isNotNullORBlank = (...args)=> {
   return true;
 }
 export const initMenu = (router, store)=> {
-  debugger
   if (store.state.routes.length > 0) {
     return;
   }
@@ -34,7 +33,9 @@ export const formatRoutes = (routes)=> {
       name,
       meta,
       iconCls,
-      children
+      children,
+      enabled,
+      id
     } = router;
     if (children && children instanceof Array) {
       children = formatRoutes(children);
@@ -42,6 +43,8 @@ export const formatRoutes = (routes)=> {
     let fmRouter = {
       path: path,
       component(resolve){
+        if(component==null)
+          return;
         if (component.startsWith("Home")) {
           require(['../components/' + component + '.vue'], resolve)
         } else if (component.startsWith("Emp")) {
@@ -54,12 +57,16 @@ export const formatRoutes = (routes)=> {
           require(['../components/statistics/' + component + '.vue'], resolve)
         } else if (component.startsWith("Sys")) {
           require(['../components/system/' + component + '.vue'], resolve)
+        } else if (component.startsWith("Blog")) {
+          require(['../components/blog/' + component + '.vue'], resolve)
         }
       },
       name: name,
       iconCls: iconCls,
       meta: meta,
-      children: children
+      children: children,
+      enabled:enabled,
+      id:id
     };
     fmRoutes.push(fmRouter);
   })

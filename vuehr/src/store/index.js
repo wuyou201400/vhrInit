@@ -22,7 +22,6 @@ export default new Vuex.Store({
   },
   mutations: {
     initMenu(state, menus){
-      debugger
       state.routes = menus;
     },
     login(state, user){
@@ -36,7 +35,6 @@ export default new Vuex.Store({
       state.routes = [];
     },
     toggleNFDot(state, newValue){
-      debugger
       state.nfDot = newValue;
     },
     updateMsgList(state, newMsgList){
@@ -58,7 +56,6 @@ export default new Vuex.Store({
   },
   actions: {
     connect(context){
-      debugger
       context.state.stomp = Stomp.over(new SockJS("/ws/endpointChat"));
       context.state.stomp.connect({}, frame=> {
         context.state.stomp.subscribe("/user/queue/chat", message=> {

@@ -34,12 +34,12 @@ export default new Router({
       path: '/',
       name: 'Login',
       component: Login,
-      hidden: true
+      enabled: true
     }, {
       path: '/home',
       name: '主页',
       component: Home,
-      hidden: true,
+      enabled: true,
       meta: {
         requireAuth: true
       },
@@ -48,7 +48,7 @@ export default new Router({
           path: '/chat',
           name: '消息',
           component: Chat,
-          hidden: true,
+          enabled: true,
           meta: {
             keepAlive: false,
             requireAuth: true

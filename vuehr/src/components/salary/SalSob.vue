@@ -2,7 +2,7 @@
   <div>
     <el-container>
       <el-header style="display: flex;justify-content: space-between;align-items: center;padding-left: 0px">
-        <el-button @click="dialogVisible = true" icon="el-icon-plus" type="primary" size="mini">添加账套</el-button>
+        <el-button @click="handleAdd" icon="el-icon-plus" type="primary" size="mini">添加账套</el-button>
         <el-button size="mini" type="success" @click="loadSalaryCfg" icon="el-icon-refresh"></el-button>
       </el-header>
       <el-main style="padding-left: 0px;padding-top: 0px">
@@ -113,7 +113,7 @@
     </el-container>
     <div style="text-align: left">
       <el-dialog
-        title="添加工资账套"
+        :title="dialogTitle"
         :visible.sync="dialogVisible"
         width="50%"
         @close="emptySalary"
@@ -269,6 +269,7 @@
     data() {
       return {
         dialogVisible: false,
+        dialogTitle:'',
         tableLoading: false,
         index: 0,
         salaries: [],
@@ -311,8 +312,13 @@
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
+      handleAdd(){
+        this.dialogVisible=true;
+        this.dialogTitle='添加账套';
+      },
       handleEdit(index, row) {
         this.dialogVisible = true;
+        this.dialogTitle='编辑账套';
         row.createDate = new Date(row.createDate);
         delete row.allSalary;
         this.salary = row;
@@ -413,6 +419,7 @@
       }
     },
     mounted: function () {
+      debugger
       this.loadSalaryCfg();
     }
   };

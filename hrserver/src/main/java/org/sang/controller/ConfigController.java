@@ -21,7 +21,14 @@ public class ConfigController {
     MenuService menuService;
     @RequestMapping("/sysmenu")
     public List<Menu> sysmenu() {
-        return menuService.getMenusByHrId();
+        List<Menu> list= menuService.getMenusByHrId();
+        return list;
+    }
+
+    @RequestMapping("/sysmenutree")
+    public List<Menu> sysmesysmenutreenu() {
+        List<Menu> list= menuService.getMenusByHrIdTree();
+        return list;
     }
 
     @RequestMapping("/hr")

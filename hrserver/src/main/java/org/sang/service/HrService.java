@@ -3,6 +3,7 @@ package org.sang.service;
 import org.sang.bean.Hr;
 import org.sang.common.HrUtils;
 import org.sang.mapper.HrMapper;
+import org.sang.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -69,4 +70,8 @@ public class HrService implements UserDetailsService {
     public List<Hr> getAllHr() {
         return hrMapper.getAllHr(null);
     }
+    public int updateUserEmail(String email) {
+        return hrMapper.updateUserEmail(email, Util.getCurrentUser().getId());
+    }
+
 }

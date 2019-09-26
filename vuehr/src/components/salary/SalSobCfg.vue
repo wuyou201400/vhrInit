@@ -142,6 +142,7 @@
       }
     },
     mounted: function () {
+      debugger
       this.loadEmps();
     },
     methods: {
