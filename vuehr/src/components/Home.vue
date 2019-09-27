@@ -24,7 +24,7 @@
       <el-container>
         <el-aside width="180px" class="home-aside">
           <div style="display: flex;justify-content: flex-start;width: 180px;text-align: left;">
-            <el-menu style="background: #ececec;width: 180px;" unique-opened router>
+<!--            <el-menu style="background: #ececec;width: 180px;" unique-opened router>
               <template v-for="(item,index) in this.routes" v-if="item.enabled">
                 <el-submenu :key="index" :index="index+''">
                   <template slot="title">
@@ -39,23 +39,23 @@
                   </el-menu-item>
                 </el-submenu>
               </template>
-            </el-menu>
+            </el-menu>-->
         <!--    <el-menu style="background: #ececec;width: 180px;" unique-opened router>
               <template v-for="(item,index) in this.routes" v-if="item.enabled">
-                <el-submenu :key="index" :index="index+''">
+                <el-submenu :index="index+''">
                   <template slot="title">
                     <i :class="item.iconCls" style="color: #20a0ff;width: 14px;"></i>
                     <span slot="title">{{item.name}}</span>
                   </template>
-                  <template v-for="(item,index) in item.children" v-if="item.enabled">
-                    <el-submenu :key="index" :index="index+''">
+                  <template v-for="(item1,index1) in item.children" v-if="item1.enabled">
+                    <el-submenu  :index="index+'-'+index1">
                       <template slot="title">
-                        <i :class="item.iconCls" style="color: #20a0ff;width: 14px;"></i>
-                        <span slot="title">{{item.name}}</span>
+                        <i :class="item1.iconCls" style="color: #20a0ff;width: 14px;"></i>
+                        <span slot="title">{{item1.name}}</span>
                       </template>
                       <el-menu-item width="180px"
-                                    style="padding-left: 30px;padding-right:0px;margin-left: 0px;width: 170px;text-align: left"
-                                    v-for="child in item.children"  v-if="child.enabled"
+                                    style="padding-left: 60px;padding-right:0px;margin-left: 0px;width: 170px;text-align: left"
+                                    v-for="child in item1.children"  v-if="child.enabled"
                                     :index="child.path"
                       >{{child.name}}
                       </el-menu-item>
@@ -64,13 +64,14 @@
                 </el-submenu>
               </template>
             </el-menu>-->
-      <!--      <el-menu
+            <el-menu
               unique-opened
               router
+              :default-active="this.$router.currentRoute.path"
+              :index="1"
               style="background: #ececec;width: 180px;">
-              <SubMenuItem v-for="(menu,index) in this.routes" v-if="menu.enabled" :key="menu.id" :item="menu" />
-            </el-menu>-->
-
+              <SubMenuItem v-for="menu in this.routes" v-if="menu.enabled" :item="menu" />
+            </el-menu>
 
           </div>
         </el-aside>

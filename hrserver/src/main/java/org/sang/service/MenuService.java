@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,6 +41,23 @@ public class MenuService {
     }
 
     public List<Long> getMenusByRid(Long rid) {
-        return menuMapper.getMenusByRid(rid);
+        List<Menu> allMenusInRole= menuMapper.getMenusByRid(rid);
+        List<Long> leafMenus=new LinkedList<>();
+        for(Integer i=0;i<allMenusInRole.size();i++)
+        {
+            boolean isParent=false;
+            Long id=allMenusInRole.get(i).getId();
+            for(Integer j=0;j<allMenusInRole.size();j++)
+            {
+                if(allMenusInRole.get(j).getParentId()==id)
+                {
+                    isParent=true;
+                    break;
+                }
+            }
+            if(!isParent)
+                leafMenus.add(id);
+        }
+        return leafMenus;
     }
 }

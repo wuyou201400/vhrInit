@@ -100,16 +100,24 @@
       },
       //有五个树，但是五个树用的同一个数据源
       updateRoleMenu(index){
-        var checkedKeys = this.$refs.tree[index].getCheckedKeys(true);
-        var _this = this;
-        this.putRequest("/system/basic/updateMenuRole", {
-          rid: this.activeColItem,
-          mids: checkedKeys
-        }).then(resp=> {
-          if (resp && resp.status == 200) {
-            _this.activeColItem = -1;
-          }
-        })
+        this.$confirm('确定修改吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var checkedKeys = this.$refs.tree[index].getCheckedKeys();
+          var harfCheckedKeys = this.$refs.tree[index].getHalfCheckedKeys();
+          var _this = this;
+          this.putRequest("/system/basic/updateMenuRole", {
+            rid: this.activeColItem,
+            mids: checkedKeys.concat(harfCheckedKeys)
+          }).then(resp=> {
+            if (resp && resp.status == 200) {
+              _this.activeColItem = -1;
+            }
+          })
+        }).catch(() => {
+        });
       },
       collapseChange(activeName){
         if (activeName == '') {

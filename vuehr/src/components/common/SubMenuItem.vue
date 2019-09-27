@@ -2,21 +2,21 @@
   <div>
   <div v-if="item.children">
     <template v-if="item.children.length == 0">
-      <el-menu-item :index="item.path" v-if="item.enabled" :key="item.path">
+      <el-menu-item :index="item.path" v-if="item.enabled">
         <i :class="item.iconCls" style="color: #20a0ff;width: 14px;"></i>
         {{item.name}}
       </el-menu-item>
     </template>
-    <el-submenu v-else>
+    <el-submenu :index="item.id" v-else>
       <template slot="title" >
         <i :class="item.iconCls" style="color: #20a0ff;width: 14px;"></i>
         {{item.name}}
       </template>
-      <SubMenuItem v-for="menu in item.children" v-if="menu.enabled" :key="menu.id" :item="menu" />
+      <SubMenuItem v-for="submenu in item.children" v-if="submenu.enabled" :item="submenu" />
     </el-submenu>
   </div>
   <template v-else>
-    <el-menu-item :index="item.path" v-if="item.enabled" :key="item.id">
+    <el-menu-item :index="item.path" v-if="item.enabled">
       <i :class="item.iconCls" style="color: #20a0ff;width: 14px;"></i>
       {{item.name}}
     </el-menu-item>
@@ -30,7 +30,7 @@
     props: {
       item: {
         type: Object,
-        // required: true
+        required: true
       }
     }
   }

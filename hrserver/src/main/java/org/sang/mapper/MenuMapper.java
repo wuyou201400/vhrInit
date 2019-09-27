@@ -16,5 +16,5 @@ public interface MenuMapper {
 
     List<Menu> menuTree();
 
-    List<Long> getMenusByRid(Long rid);
+    List<Menu> getMenusByRid(Long rid);
 }
