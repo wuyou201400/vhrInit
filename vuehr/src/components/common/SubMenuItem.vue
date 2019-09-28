@@ -7,12 +7,12 @@
         {{item.name}}
       </el-menu-item>
     </template>
-    <el-submenu :index="item.id" v-else>
+    <el-submenu :index="item.id+''" v-else>
       <template slot="title" >
         <i :class="item.iconCls" style="color: #20a0ff;width: 14px;"></i>
         {{item.name}}
       </template>
-      <SubMenuItem v-for="submenu in item.children" v-if="submenu.enabled" :item="submenu" />
+      <SubMenuItem v-for="(submenu,index) in item.children" v-if="submenu.enabled" :item="submenu" :key="index" />
     </el-submenu>
   </div>
   <template v-else>

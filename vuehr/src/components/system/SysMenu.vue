@@ -73,8 +73,10 @@
         this.treeLoading = false;
       },
       add(node,data, event) {
+
       },
       del(node,data, event) {
+
       }
     }
   }

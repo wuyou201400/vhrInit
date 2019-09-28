@@ -68,9 +68,10 @@
               unique-opened
               router
               :default-active="this.$router.currentRoute.path"
+              :default-openeds="['1']"
               :index="1"
               style="background: #ececec;width: 180px;">
-              <SubMenuItem v-for="menu in this.routes" v-if="menu.enabled" :item="menu" />
+              <SubMenuItem v-for="(menu,index) in this.routes" v-if="menu.enabled" :item="menu" :key="index" />
             </el-menu>
 
           </div>
