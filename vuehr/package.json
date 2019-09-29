@@ -14,11 +14,12 @@
     "element-ui": "^2.4.5",
     "font-awesome": "^4.7.0",
     "mavon-editor": "^2.7.6",
+    "qs": "^6.9.0",
     "vue": "^2.5.2",
+    "vue-echarts": "latest",
     "vue-router": "^3.0.1",
     "vue-stomp": "0.0.5",
-    "vuex": "^3.0.1",
-    "vue-echarts": "latest"
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

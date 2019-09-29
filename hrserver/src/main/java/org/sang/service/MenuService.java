@@ -60,4 +60,13 @@ public class MenuService {
         }
         return leafMenus;
     }
+
+    public int AddMenu(Menu menu)
+    {
+        return menuMapper.addMenu(menu);
+    }
+    public  int updateMenu(Menu menu)
+    {
+        return menuMapper.updateMenu(menu);
+    }
 }

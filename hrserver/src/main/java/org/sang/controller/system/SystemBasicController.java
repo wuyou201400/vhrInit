@@ -3,10 +3,7 @@ package org.sang.controller.system;
 import org.sang.bean.*;
 import org.sang.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +52,31 @@ public class SystemBasicController {
         List<Long> selMids = menuService.getMenusByRid(rid);
         map.put("mids", selMids);
         return map;
+    }
+
+    @RequestMapping(value = "/menu", method = RequestMethod.POST)
+    public Map<String, Object> addMenu(@RequestBody Menu menu)
+    {
+        Map<String, Object> map = new HashMap<>();
+        if(menuService.AddMenu(menu)==1)
+        {
+            map.put("status", "success");
+            map.put("data", menu);
+        }
+        else
+        {
+            map.put("status", "error");
+            map.put("data",  "添加失败!");
+        }
+        return  map;
+    }
+    @RequestMapping(value = "/menu", method = RequestMethod.PUT)
+    public RespBean updateMenu(Menu menu)
+    {
+        if(menuService.updateMenu(menu)==1)
+            return RespBean.ok("更新成功!");
+        else
+            return RespBean.error("更新失败!");
     }
 
     @RequestMapping(value = "/updateMenuRole", method = RequestMethod.PUT)

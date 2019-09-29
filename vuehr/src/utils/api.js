@@ -1,5 +1,7 @@
 import axios from 'axios'
+import Qs from 'qs'
 import {Message} from 'element-ui'
+
 axios.interceptors.request.use(config => {
   return config;
 }, err => {
@@ -48,6 +50,19 @@ export const postRequest = (url, params) => {
         ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
       }
       return ret
+    }],
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+}
+export const postRequestWithComplexParam = (url, params) => {
+  return axios({
+    method: 'post',
+    url: `${base}${url}`,
+    data: params,
+    transformRequest: [ function(data){
+      return Qs.stringify(data)
     }],
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'

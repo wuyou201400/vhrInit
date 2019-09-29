@@ -68,12 +68,11 @@
               unique-opened
               router
               :default-active="this.$router.currentRoute.path"
-              :default-openeds="['1']"
+              :default-openeds="defaultOpeneds"
               :index="1"
               style="background: #ececec;width: 180px;">
               <SubMenuItem v-for="(menu,index) in this.routes" v-if="menu.enabled" :item="menu" :key="index" />
             </el-menu>
-
           </div>
         </el-aside>
         <el-main>
@@ -150,7 +149,7 @@
     },
     data() {
       return {
-        isDot: false
+        isDot: false,
       }
     },
     computed: {
@@ -159,6 +158,9 @@
       },
       routes() {
         return this.$store.state.routes
+      },
+      defaultOpeneds(){
+        return this.$router.currentRoute.path=='/home'?['1']:[];
       }
     }
   }

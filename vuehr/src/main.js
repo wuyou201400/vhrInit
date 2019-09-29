@@ -8,12 +8,14 @@ import 'element-ui/lib/theme-chalk/index.css'
 import store from './store'
 import {getRequest} from './utils/api'
 import {postRequest} from './utils/api'
+import {postRequestWithComplexParam} from './utils/api'
 import {deleteRequest} from './utils/api'
 import {putRequest} from './utils/api'
 import {initMenu} from './utils/utils'
 import {isNotNullORBlank} from './utils/utils'
 import './utils/filter_utils'
 import 'font-awesome/css/font-awesome.min.css'
+
 
 // 开发环境下，Vue 会提供很多警告来帮你对付常见的错误与陷阱。而在生产环境下，这些警告语句却没有用，反而会增加应用的体积。
 // 此外，有些警告检查还有一些小的运行时开销，这在生产环境模式下是可以避免的。(摘于官网说明)
@@ -26,9 +28,11 @@ Vue.use(ElementUI)
 
 Vue.prototype.getRequest = getRequest;
 Vue.prototype.postRequest = postRequest;
+Vue.prototype.postRequestWithComplexParam = postRequestWithComplexParam;
 Vue.prototype.deleteRequest = deleteRequest;
 Vue.prototype.putRequest = putRequest;
 Vue.prototype.isNotNullORBlank = isNotNullORBlank;
+
 
 router.beforeEach((to, from, next)=> {
     if (to.name == 'Login') {

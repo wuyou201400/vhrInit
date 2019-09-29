@@ -117,4 +117,13 @@
         FROM menu m,hr_role hr,menu_role mr
         WHERE m.id=mr.mid and mr.rid=hr.rid and hr.hrid=#{hrId} and m.parentId is null
     </select>
+
+    <insert id="addMenu" parameterType="org.sang.bean.Menu" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO menu SET url=#{url},path=#{path},component=#{component},name=#{name},iconCls=#{iconCls},keepAlive=#{keepAlive},requireAuth=#{requireAuth},parentId=#{parentId},enabled=#{enabled}
+    </insert>
+    <update id="updateMenu" parameterType="org.sang.bean.Menu">
+        UPDATE menu SET url=#{url},path=#{path},component=#{component},name=#{name},iconCls=#{iconCls},keepAlive=#{keepAlive},requireAuth=#{requireAuth},parentId=#{parentId},enabled=#{enabled} WHERE id=#{id}
+    </update>
+
+
 </mapper>
