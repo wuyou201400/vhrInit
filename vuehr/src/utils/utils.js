@@ -1,7 +1,7 @@
 import {getRequest} from './api'
 import {Message} from 'element-ui'
 
-export const isNotNullORBlank = (...args)=> {
+export const isNotNullORBlank = (...args) => {
   for (var i = 0; i < args.length; i++) {
     var argument = args[i];
     if (argument == null || argument == '' || argument == undefined) {
@@ -11,22 +11,22 @@ export const isNotNullORBlank = (...args)=> {
   }
   return true;
 }
-export const initMenu = (router, store)=> {
+export const initMenu = (router, store) => {
   if (store.state.routes.length > 0) {
     return;
   }
-  getRequest("/config/sysmenutree").then(resp=> {
+  getRequest("/config/sysmenutree").then(resp => {
     if (resp && resp.status == 200) {
       var fmtRoutes = formatRoutes(resp.data);
       router.addRoutes(fmtRoutes);
-      store.commit('initMenu', fmtRoutes);
+      store.commit({type: 'initMenu', menus: resp.data, fmtRoutes: fmtRoutes});
       store.dispatch('connect');
     }
   })
 }
-export const formatRoutes = (routes)=> {
+export const formatRoutes = (routes) => {
   let fmRoutes = [];
-  routes.forEach(router=> {
+  routes.forEach(router => {
     let {
       path,
       component,
@@ -42,8 +42,8 @@ export const formatRoutes = (routes)=> {
     }
     let fmRouter = {
       path: path,
-      component(resolve){
-        if(component==null)
+      component(resolve) {
+        if (component == null)
           return;
         if (component.startsWith("Home")) {
           require(['../components/' + component + '.vue'], resolve)
@@ -65,8 +65,8 @@ export const formatRoutes = (routes)=> {
       iconCls: iconCls,
       meta: meta,
       children: children,
-      enabled:enabled,
-      id:id
+      enabled: enabled,
+      id: id
     };
     fmRoutes.push(fmRouter);
   })

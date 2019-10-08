@@ -45,7 +45,7 @@
               用户角色:
               <el-tag
                 v-for="role in item.roles"
-                :key="role.id"
+                :key="item.id+''+role.id"
                 type="success"
                 size="mini"
                 style="margin-right: 5px"

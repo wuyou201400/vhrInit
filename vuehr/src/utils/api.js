@@ -61,11 +61,11 @@ export const postRequestWithComplexParam = (url, params) => {
     method: 'post',
     url: `${base}${url}`,
     data: params,
-    transformRequest: [ function(data){
+/*    transformRequest: [ function(data){
       return Qs.stringify(data)
-    }],
+    }],*/
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/json;charset=UTF-8'
     }
   });
 }
@@ -93,6 +93,16 @@ export const putRequest = (url, params) => {
     }],
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+}
+export const putRequestWithComplexParam = (url, params) => {
+  return axios({
+    method: 'put',
+    url: `${base}${url}`,
+    data: params,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
     }
   });
 }

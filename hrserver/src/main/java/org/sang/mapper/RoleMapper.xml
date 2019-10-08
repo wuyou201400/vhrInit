@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.sang.mapper.RoleMapper">
-    <select id="roles" resultType="org.sang.bean.Role">
-        SELECT * FROM role where id!=6;
+    <select id="getRolesByHrid" parameterType="Long" resultType="org.sang.bean.Role">
+        SELECT role.* FROM hr,hr_role,role WHERE hr.id=hr_role.hrid AND hr_role.rid=role.id AND hr.id=#{hrid};
     </select>
     <insert id="addNewRole">
         INSERT INTO role set name=#{role},nameZh=#{roleZh}

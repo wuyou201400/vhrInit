@@ -14,6 +14,8 @@
         :props="defaultProps"
         :data="treeData"
         ref="tree"
+        node-key="id"
+        :default-expanded-keys="[1]"
         :filter-node-method="filterNode"
         v-loading="treeLoading"
         style="width: 500px;margin-top: 10px">
@@ -30,7 +32,13 @@
           <el-button
             type="text"
             size="mini"
-            @click="() => remove(node, data)">
+            @click="() => edit(node, data)">
+            编辑
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @click="() => del(node, data)">
             删除
           </el-button>
         </span>
@@ -63,20 +71,20 @@
             <el-input v-model="editMenu.iconCls" placeholder="请输入菜单图标..."
                       @keyup.enter.native="addOrEditMenu"></el-input>
           </el-form-item>
-        <!--  <el-form-item label="keepAlive">
-            <el-switch
-              v-model="editMenu.keepAlive"
-              active-color="#13ce66"
-              inactive-color="#ff4949">
-            </el-switch>
-          </el-form-item>
-          <el-form-item label="requireAuth">
-            <el-switch
-              v-model="editMenu.requireAuth"
-              active-color="#13ce66"
-              inactive-color="#ff4949">
-            </el-switch>
-          </el-form-item>-->
+          <!--  <el-form-item label="keepAlive">
+              <el-switch
+                v-model="editMenu.keepAlive"
+                active-color="#13ce66"
+                inactive-color="#ff4949">
+              </el-switch>
+            </el-form-item>
+            <el-form-item label="requireAuth">
+              <el-switch
+                v-model="editMenu.requireAuth"
+                active-color="#13ce66"
+                inactive-color="#ff4949">
+              </el-switch>
+            </el-form-item>-->
           <el-form-item label="是否启用" prop="enabled">
             <el-switch
               v-model="editMenu.enabled"
@@ -87,7 +95,7 @@
         </el-form>
         <span slot="footer" class="dialog-footer">
             <el-button size="small" @click="dialogVisible = false">取消</el-button>
-            <el-button size="small" type="primary" @click="addOrEditMenu">添加</el-button>
+            <el-button size="small" type="primary" @click="addOrEditMenu">确定</el-button>
           </span>
       </el-dialog>
 
@@ -116,7 +124,7 @@
           component: '1',
           name: '1',
           iconCls: '',
-          meta:{
+          meta: {
             keepAlive: false,
             requireAuth: true,
           },
@@ -146,37 +154,56 @@
         return data.name.indexOf(value) !== -1;
       },
       loadTreeData() {
-        this.treeData = this.$store.state.routes;
+        this.treeData = this.$store.state.menus;
         this.treeLoading = false;
       },
+      emptyMenu() {
+        this.editMenu = {
+          id: '',
+          url: '',
+          path: '',
+          component: '',
+          name: '',
+          iconCls: '',
+          meta: {
+            keepAlive: false,
+            requireAuth: true,
+          },
+          parentId: '',
+          enabled: true,
+        };
+      },
       add(node, data) {
-        this.dialogTitle = data.name + '>>>新增子菜单';
-        this.dialogVisible = true;
+        this.emptyMenu();
         this.editMenu.parentId = data.id;
+        this.dialogTitle = data.name + '》新增子菜单';
+        this.dialogVisible = true;
+      },
+      edit(node, data) {
+        this.dialogTitle = '编辑》' + data.name;
+        this.dialogVisible = true;
+        this.editMenu = data;
       },
       addOrEditMenu() {
-        var _this = this;
+        let _this = this;
         this.$refs['form'].validate((valid) => {
           if (valid) {
             if (_this.editMenu.id) {//更新
               _this.treeLoading = true;
-              _this.putRequest("/system/basic/menu", _this.editMenu).then(resp => {
+              _this.putRequestWithComplexParam("/system/basic/updateMenu", _this.editMenu).then(resp => {
                 _this.treeLoading = false;
                 if (resp && resp.status == 200) {
                   _this.dialogVisible = false;
-                  _this.emptyEmpData();
-                  _this.loadEmps();
+                  _this.afterUpdate(_this.editMenu);
                 }
               })
             } else {//添加
               _this.treeLoading = true;
-              // _this.editMenu.meta=JSON.stringify(_this.editMenu.meta);
               _this.postRequestWithComplexParam("/system/basic/menu", _this.editMenu).then(resp => {
                 _this.treeLoading = false;
                 if (resp && resp.status == 200) {
                   _this.dialogVisible = false;
-                  var data = resp.data;
-                _this.afterAdd(data.data);
+                  _this.afterAdd(resp.data.data);
                 }
               })
             }
@@ -185,16 +212,66 @@
           }
         });
       },
-      afterAdd(menu){
-        for(var i=0;i<this.treeData.length;i++){
-          if(treeData[i].id==menu.parentId){
+      afterAdd(menu) {
+        for (var i = 0; i < this.treeData.length; i++) {
+          if (treeData[i].id == menu.parentId) {
             this.treeData[i].children.push(menu);
             break;
           }
         }
       },
+      afterUpdate(menu) {
+        for (var i = 0; i < this.treeData.length; i++) {
+          if (treeData[i].id == menu.id) {
+            Object.assign(this.treeData[i], menu);
+            break;
+          }
+        }
+      },
       del(node, data) {
+        if (data.children.length > 0) {
+          this.$alert('该菜单[' + data.name + ']有子菜单，请先删除子菜单!', '友情提示', {
+            confirmButtonText: '确定',
+            callback: action => {
 
+            }
+          });
+          return;
+        }
+        var message = '此操作将删除菜单[' + data.name + '], 是否继续?';
+        if (data.roles.length > 0) {
+          message = '该菜单[' + data.name + ']已被分配给角色[';
+          for (var i = 0; i < data.roles.length; i++)
+            message += data.roles[i]['nameZh'] + ',';
+          message += '],是否继续?'
+        }
+        this.$confirm(message, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+           this.doDelete(data.id,node);
+        }).catch(() => {
+        });
+      },
+      doDelete(id,node) {
+        this.treeLoading = true;
+        var _this = this;
+        this.deleteRequest("/system/basic/menuTree/" + id).then(resp => {
+          _this.treeLoading = false;
+          if (resp && resp.status == 200) {
+            _this.afterDel(_this.treeData,id);
+          }
+        })
+      },
+      afterDel(treeDataArray,id) {
+        for (var i = 0; i <treeDataArray.length; i++) {
+          if (treeDataArray[i].id == id) {
+            treeDataArray.splice(i,1);
+            break;
+          }
+          this.afterDel(treeDataArray[i].children,id)
+        }
       }
     }
   }

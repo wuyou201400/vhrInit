@@ -46,26 +46,23 @@
     <select id="getAllMenu" resultMap="BaseResultMap">
         select m.*,r.`id` as rid,r.`name` as rname,r.`nameZh` as rnamezh from menu m left join menu_role mr on m.`id`=mr.`mid` left join role r on mr.`rid`=r.`id` WHERE m.`enabled`=true order by m.`id` desc
     </select>
-    <select id="getMenusByHrId" parameterType="Long" resultMap="BaseResultMap">
-        select m1.`id`,m1.`path`,m1.`component`,m1.`iconCls`,m1.`name`,m1.`requireAuth`,m1.`enabled`,m2.`component` as component2,m2.`iconCls` as iconCls2,m2.`keepAlive` as keepAlive2,m2.`name` as name2,m2.`path` as path2,m2.`requireAuth` as requireAuth2,m2.`enabled` as enabled2 from menu m1,menu m2 where m1.`id`=m2.`parentId` and m2.`id` in(select mr.`mid` from hr_role h_r,menu_role mr where h_r.`rid`=mr.`rid` and h_r.`hrid`=#{hrId}) order by m1.`id`,m2.`id`
-    </select>
-    <select id="menuTree" resultMap="BaseResultMap">
-            select m1.`id`,m1.`name`,m2.`id` as id2,m2.`name` as name2,m3.`id` as id3,m3.`name` as name3 from menu m1,menu m2,menu m3 where m1.`id`=m2.`parentId` and m2.`id`=m3.`parentId` and m3.`enabled`=true
-        </select>
+
+
+
+
     <select id="getMenusByRid" resultMap="LeafResultMap">
-        SELECT m.id,m.parentId from menu m,menu_role mr WHERE m.id=mr.mid and mr.rid=#{rid}
+        SELECT m.id,m.parentId from menu m,menu_role mr WHERE m.id=mr.mid and m.isdeleted=0 and mr.rid=#{rid}
     </select>
 
 
-    <!--获取树形数据-->
-    <resultMap id="BaseTreeResultMap" type="org.sang.bean.Menu">
+    <!--获取带角色的菜单树形数据-->
+    <resultMap id="MenuTreeByRoleResultMap" type="org.sang.bean.Menu">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="url" property="url" jdbcType="VARCHAR"/>
         <result column="path" property="path" jdbcType="VARCHAR"/>
         <result column="component" property="component" javaType="java.lang.Object"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="iconCls" property="iconCls" jdbcType="VARCHAR"/>
-        <result column="keepAlive" property="keepAlive" jdbcType="BIT"/>
         <result column="parentId" property="parentId" jdbcType="INTEGER"/>
         <result column="enabled" property="enabled"/>
         <association property="meta" javaType="org.sang.bean.MenuMeta">
@@ -77,53 +74,62 @@
             <result column="rname" property="name"/>
             <result column="rnamezh" property="nameZh"/>
         </collection>
-        <collection column="{id=id,rid=rid}" property="children" javaType="java.util.ArrayList"
-                    ofType="org.sang.bean.Menu" select="getNextNodeTree"/>
     </resultMap>
-    <resultMap id="NextTreeResultMap" type="org.sang.bean.Menu">
-        <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="url" property="url" jdbcType="VARCHAR"/>
-        <result column="path" property="path" jdbcType="VARCHAR"/>
-        <result column="component" property="component" javaType="java.lang.Object"/>
-        <result column="name" property="name" jdbcType="VARCHAR"/>
-        <result column="iconCls" property="iconCls" jdbcType="VARCHAR"/>
-        <result column="keepAlive" property="keepAlive" jdbcType="BIT"/>
-        <result column="parentId" property="parentId" jdbcType="INTEGER"/>
-        <result column="enabled" property="enabled"/>
-        <association property="meta" javaType="org.sang.bean.MenuMeta">
-            <result column="keepAlive" property="keepAlive"/>
-            <result column="requireAuth" property="requireAuth"/>
-        </association>
-        <collection property="roles" ofType="org.sang.bean.Role">
-            <id column="rid" property="id"/>
-            <result column="rname" property="name"/>
-            <result column="rnamezh" property="nameZh"/>
-        </collection>
-        <collection column="{id=id,rid=rid}" property="children" javaType="java.util.ArrayList"
-                    ofType="org.sang.bean.Menu" select="getNextNodeTree"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-        m.`id`,m.`path`,m.`component`,m.`iconCls`,m.`name`,m.`requireAuth`,m.`enabled`,mr.`rid`
+    <sql id="MenuTree_Column_ByRole">
+        m.`id`,m.`url`,m.`path`,m.`component`,m.`iconCls`,m.`name`,m.`requireAuth`,m.`parentId`,m.`enabled`,mr.`rid`,r.`name` rname,r.`nameZh` rnamezh
     </sql>
-    <select id="getNextNodeTree" resultMap="NextTreeResultMap">
+    <select id="getMenuTreeByHrId" parameterType="Long" resultMap="MenuTreeByRoleResultMap">
         SELECT
-        <include refid="Base_Column_List"/>
-        FROM menu m,menu_role mr
-        WHERE m.id=mr.mid and m.parentId = #{id} and mr.rid=#{rid}
+        <include refid="MenuTree_Column_ByRole"/>
+        FROM menu m,hr_role hr,menu_role mr,role r
+        WHERE m.id=mr.mid and mr.rid=hr.rid and mr.rid=r.id and m.isdeleted=0 and hr.hrid=#{hrId}
     </select>
-    <select id="getMenusByHrIdTree" parameterType="Long" resultMap="BaseTreeResultMap">
+
+
+
+    <!--获取不带角色的菜单树形数据-->
+    <resultMap id="MenuTreeResultMap" type="org.sang.bean.Menu">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="path" property="path" jdbcType="VARCHAR"/>
+        <result column="component" property="component" javaType="java.lang.Object"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="iconCls" property="iconCls" jdbcType="VARCHAR"/>
+        <result column="parentId" property="parentId" jdbcType="INTEGER"/>
+        <result column="enabled" property="enabled"/>
+        <association property="meta" javaType="org.sang.bean.MenuMeta">
+            <result column="keepAlive" property="keepAlive"/>
+            <result column="requireAuth" property="requireAuth"/>
+        </association>
+        <collection column="{id=id}" property="children" javaType="java.util.ArrayList"
+                    ofType="org.sang.bean.Menu" select="getNextNodeTree"/>
+    </resultMap>
+    <sql id="MenuTree_Column">
+        m.`id`,m.`url`,m.`path`,m.`component`,m.`iconCls`,m.`name`,m.`requireAuth`,m.`parentId`,m.`enabled`
+    </sql>
+    <select id="getNextNodeTree" resultMap="MenuTreeResultMap">
         SELECT
-        <include refid="Base_Column_List"/>
-        FROM menu m,hr_role hr,menu_role mr
-        WHERE m.id=mr.mid and mr.rid=hr.rid and hr.hrid=#{hrId} and m.parentId is null
+        <include refid="MenuTree_Column"/>
+        FROM menu m
+        WHERE m.isdeleted=0 and m.parentId = #{id}
     </select>
+    <select id="menuTree" resultMap="MenuTreeResultMap">
+        SELECT
+        <include refid="MenuTree_Column"/>
+        FROM menu m
+        WHERE m.isdeleted=0 and m.parentId is null
+    </select>
+
+
 
     <insert id="addMenu" parameterType="org.sang.bean.Menu" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO menu SET url=#{url},path=#{path},component=#{component},name=#{name},iconCls=#{iconCls},keepAlive=#{keepAlive},requireAuth=#{requireAuth},parentId=#{parentId},enabled=#{enabled}
+        INSERT INTO menu SET url=#{url},path=#{path},component=#{component},name=#{name},iconCls=#{iconCls},requireAuth=#{meta.requireAuth},parentId=#{parentId},enabled=#{enabled}
     </insert>
     <update id="updateMenu" parameterType="org.sang.bean.Menu">
-        UPDATE menu SET url=#{url},path=#{path},component=#{component},name=#{name},iconCls=#{iconCls},keepAlive=#{keepAlive},requireAuth=#{requireAuth},parentId=#{parentId},enabled=#{enabled} WHERE id=#{id}
+        UPDATE menu SET url=#{url},path=#{path},component=#{component},name=#{name},iconCls=#{iconCls},requireAuth=#{meta.requireAuth},parentId=#{parentId},enabled=#{enabled} WHERE id=#{id}
     </update>
-
+    <update id="deleteMenu" parameterType="Long">
+        UPDATE menu SET isdeleted=1 WHERE id=#{id}
+    </update>
 
 </mapper>

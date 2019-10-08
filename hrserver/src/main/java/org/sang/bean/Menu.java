@@ -46,7 +46,6 @@ public class Menu implements Serializable {
         this.id = id;
     }
 
-    @JsonIgnore
     public String getUrl() {
         return url;
     }
@@ -88,7 +87,6 @@ public class Menu implements Serializable {
         this.iconCls = iconCls;
     }
 
-    @JsonIgnore
     public Long getParentId() {
         return parentId;
     }
@@ -97,20 +95,20 @@ public class Menu implements Serializable {
         this.parentId = parentId;
     }
 
-    @JsonIgnore
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }

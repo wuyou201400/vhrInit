@@ -14,6 +14,7 @@ export default new Vuex.Store({
       roles: window.localStorage.getItem('user' || '[]') == null ? '' : JSON.parse(window.localStorage.getItem('user' || '[]')).roles
     },
     routes: [],
+    menus: [],
     msgList: [],
     isDotMap: new Map(),
     currentFriend: {},
@@ -21,44 +22,45 @@ export default new Vuex.Store({
     nfDot: false
   },
   mutations: {
-    initMenu(state, menus){
-      state.routes = menus;
+    initMenu(state,stark) {
+      state.menus = stark.menus;
+      state.routes = stark.fmtRoutes;
     },
-    login(state, user){
+    login(state, user) {
       debugger
       state.user = user;
       window.localStorage.setItem('user', JSON.stringify(user));
     },
-    logout(state){
+    logout(state) {
       debugger
       window.localStorage.removeItem('user');
       state.routes = [];
     },
-    toggleNFDot(state, newValue){
+    toggleNFDot(state, newValue) {
       state.nfDot = newValue;
     },
-    updateMsgList(state, newMsgList){
+    updateMsgList(state, newMsgList) {
       debugger
       state.msgList = newMsgList;
     },
-    updateCurrentFriend(state, newFriend){
+    updateCurrentFriend(state, newFriend) {
       debugger
       state.currentFriend = newFriend;
     },
-    addValue2DotMap(state, key){
+    addValue2DotMap(state, key) {
       debugger
       state.isDotMap.set(key, "您有未读消息")
     },
-    removeValueDotMap(state, key){
+    removeValueDotMap(state, key) {
       debugger
       state.isDotMap.delete(key);
     }
   },
   actions: {
-    connect(context){
+    connect(context) {
       context.state.stomp = Stomp.over(new SockJS("/ws/endpointChat"));
-      context.state.stomp.connect({}, frame=> {
-        context.state.stomp.subscribe("/user/queue/chat", message=> {
+      context.state.stomp.connect({}, frame => {
+        context.state.stomp.subscribe("/user/queue/chat", message => {
           debugger
           var msg = JSON.parse(message.body);
           var oldMsg = window.localStorage.getItem(context.state.user.username + "#" + msg.from);
@@ -82,11 +84,11 @@ export default new Vuex.Store({
             context.commit('updateMsgList', JSON.parse(oldMsg2));
           }
         });
-        context.state.stomp.subscribe("/topic/nf", message=> {
+        context.state.stomp.subscribe("/topic/nf", message => {
           debugger
           context.commit('toggleNFDot', true);
         });
-      }, failedMsg=> {
+      }, failedMsg => {
 
       });
     }

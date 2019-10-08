@@ -1,6 +1,7 @@
 package org.sang.service;
 
 import org.sang.bean.Role;
+import org.sang.common.HrUtils;
 import org.sang.mapper.RoleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,8 @@ public class RoleService {
     @Autowired
     RoleMapper roleMapper;
 
-    public List<Role> roles() {
-        return roleMapper.roles();
+    public List<Role> getRolesByHrid() {
+        return roleMapper.getRolesByHrid(HrUtils.getCurrentHr().getId());
     }
 
     public int addNewRole(String role, String roleZh) {

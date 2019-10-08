@@ -19,15 +19,11 @@ import java.util.List;
 public class ConfigController {
     @Autowired
     MenuService menuService;
-    @RequestMapping("/sysmenu")
-    public List<Menu> sysmenu() {
-        List<Menu> list= menuService.getMenusByHrId();
-        return list;
-    }
+
 
     @RequestMapping("/sysmenutree")
     public List<Menu> sysmesysmenutreenu() {
-        List<Menu> list= menuService.getMenusByHrIdTree();
+        List<Menu> list= menuService.getMenuTreeByHrId();
         return list;
     }
 

@@ -11,6 +11,7 @@ import {postRequest} from './utils/api'
 import {postRequestWithComplexParam} from './utils/api'
 import {deleteRequest} from './utils/api'
 import {putRequest} from './utils/api'
+import {putRequestWithComplexParam} from './utils/api'
 import {initMenu} from './utils/utils'
 import {isNotNullORBlank} from './utils/utils'
 import './utils/filter_utils'
@@ -31,6 +32,7 @@ Vue.prototype.postRequest = postRequest;
 Vue.prototype.postRequestWithComplexParam = postRequestWithComplexParam;
 Vue.prototype.deleteRequest = deleteRequest;
 Vue.prototype.putRequest = putRequest;
+Vue.prototype.putRequestWithComplexParam = putRequestWithComplexParam;
 Vue.prototype.isNotNullORBlank = isNotNullORBlank;
 
 

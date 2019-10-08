@@ -70,14 +70,24 @@ public class SystemBasicController {
         }
         return  map;
     }
-    @RequestMapping(value = "/menu", method = RequestMethod.PUT)
-    public RespBean updateMenu(Menu menu)
+    @RequestMapping(value = "/updateMenu", method = RequestMethod.PUT)
+    public RespBean updateMenu(@RequestBody Menu menu)
     {
         if(menuService.updateMenu(menu)==1)
             return RespBean.ok("更新成功!");
         else
             return RespBean.error("更新失败!");
     }
+
+    @RequestMapping(value = "/menuTree/{id}", method = RequestMethod.DELETE)
+    public RespBean deleteMenu(@PathVariable Long id)
+    {
+        if(menuService.deleteMenu(id)==1)
+            return RespBean.ok("删除成功!");
+        else
+            return RespBean.error("删除失败!");
+    }
+
 
     @RequestMapping(value = "/updateMenuRole", method = RequestMethod.PUT)
     public RespBean updateMenuRole(Long rid, Long[] mids) {
@@ -88,8 +98,8 @@ public class SystemBasicController {
     }
 
     @RequestMapping("/roles")
-    public List<Role> allRoles() {
-        return roleService.roles();
+    public List<Role> getRolesByHrid() {
+        return roleService.getRolesByHrid();
     }
 
     @RequestMapping(value = "/dep", method = RequestMethod.POST)

@@ -1,6 +1,7 @@
 package org.sang.service;
 
 import org.sang.bean.Menu;
+import org.sang.bean.MenuMeta;
 import org.sang.common.HrUtils;
 import org.sang.mapper.MenuMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,12 +29,60 @@ public class MenuService {
         return menuMapper.getAllMenu();
     }
 
-    public List<Menu> getMenusByHrId() {
-        return menuMapper.getMenusByHrId(HrUtils.getCurrentHr().getId());
+
+    public List<Menu> getMenuTreeByHrId() {
+        List<Menu> allMenus= menuMapper.getMenuTreeByHrId(HrUtils.getCurrentHr().getId());
+        List<Menu> list=buildGroupTree(allMenus);
+        return list;
     }
 
-    public List<Menu> getMenusByHrIdTree() {
-        return menuMapper.getMenusByHrIdTree(HrUtils.getCurrentHr().getId());
+    public List<Menu> buildGroupTree(List<Menu> allmenus) {
+        List<Menu> list = new ArrayList<Menu>();
+        for (Menu menu : allmenus){
+            if(menu.getParentId()==null) {//根级目录
+                Menu child = new Menu();
+                child.setId(menu.getId());
+                child.setName(menu.getName());
+                child.setEnabled(menu.isEnabled());
+                child.setIconCls(menu.getIconCls());
+                child.setParentId(menu.getParentId());
+                child.setPath(menu.getPath());
+                child.setUrl(menu.getUrl());
+                child.setComponent(menu.getComponent());
+                MenuMeta menuMeta=new MenuMeta();
+                menuMeta.setKeepAlive(menu.getMeta().isKeepAlive());
+                menuMeta.setRequireAuth(menu.getMeta().isRequireAuth());
+                child.setMeta(menuMeta);
+                child.setChildren(treeChild(menu.getId(),allmenus));
+                child.setRoles(menu.getRoles());
+                list.add(child);
+            }
+        }
+        return list;
+    }
+    public List<Menu> treeChild(Long parentId,List<Menu> allmenus){
+        List<Menu> list = new ArrayList<Menu>();
+        for(Menu menu : allmenus){
+            Menu child = new Menu();
+            if(parentId.equals(menu.getParentId())){
+                child.setId(menu.getId());
+                child.setName(menu.getName());
+                child.setEnabled(menu.isEnabled());
+                child.setIconCls(menu.getIconCls());
+                child.setParentId(menu.getParentId());
+                child.setPath(menu.getPath());
+                child.setUrl(menu.getUrl());
+                child.setComponent(menu.getComponent());
+                MenuMeta menuMeta=new MenuMeta();
+                menuMeta.setKeepAlive(menu.getMeta().isKeepAlive());
+                menuMeta.setRequireAuth(menu.getMeta().isRequireAuth());
+                child.setMeta(menuMeta);
+                child.setChildren(treeChild(menu.getId(),allmenus));//递归循环
+                child.setRoles(menu.getRoles());
+                list.add(child);
+            }
+        }
+        return list;
     }
 
 
@@ -68,5 +118,9 @@ public class MenuService {
     public  int updateMenu(Menu menu)
     {
         return menuMapper.updateMenu(menu);
+    }
+    public  int deleteMenu(Long id)
+    {
+        return menuMapper.deleteMenu(id);
     }
 }

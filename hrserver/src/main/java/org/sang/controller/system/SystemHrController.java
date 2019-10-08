@@ -61,7 +61,7 @@ public class SystemHrController {
 
     @RequestMapping(value = "/roles",method = RequestMethod.GET)
     public List<Role> allRoles() {
-        return roleService.roles();
+        return roleService.getRolesByHrid();
     }
 
     @RequestMapping(value = "/hr/reg", method = RequestMethod.POST)
