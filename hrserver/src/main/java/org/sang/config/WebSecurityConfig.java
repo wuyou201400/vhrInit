@@ -47,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     AuthenticationAccessDeniedHandler deniedHandler;
 
-    @Override
+    @Override  //身份验证管理生成器
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(hrService)
                 .passwordEncoder(new BCryptPasswordEncoder());
@@ -70,12 +70,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         });*/
     }
 
-    @Override
+    @Override //WEB安全
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/index.html", "/static/**", "/login_p", "/favicon.ico");
     }
 
-    @Override
+    @Override  //HTTP请求安全处理
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {

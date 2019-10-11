@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 
 /**
  * Created by sang on 2017/12/29.
+ * 自定义403响应的内容
  */
 @Component
 public class AuthenticationAccessDeniedHandler implements AccessDeniedHandler {

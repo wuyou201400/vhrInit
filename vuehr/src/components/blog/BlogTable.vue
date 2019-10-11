@@ -104,7 +104,6 @@
       }
     },
     mounted: function () {
-      debugger
       this.loading = true;
       this.loadBlogs(this.currentPage, this.pageSize);
       const _this = this;

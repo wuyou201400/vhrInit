@@ -230,12 +230,16 @@
       },
       del(node, data) {
         if (data.children.length > 0) {
-          this.$alert('该菜单[' + data.name + ']有子菜单，请先删除子菜单!', '友情提示', {
+          this.$message({
+            message: '该菜单[' + data.name + ']有子菜单，请先删除子菜单!',
+            type: 'warning'
+          });
+  /*        this.$alert('该菜单[' + data.name + ']有子菜单，请先删除子菜单!', '友情提示', {
             confirmButtonText: '确定',
             callback: action => {
 
             }
-          });
+          });*/
           return;
         }
         var message = '此操作将删除菜单[' + data.name + '], 是否继续?';
@@ -260,7 +264,11 @@
         this.deleteRequest("/system/basic/menuTree/" + id).then(resp => {
           _this.treeLoading = false;
           if (resp && resp.status == 200) {
-            _this.afterDel(_this.treeData,id);
+            // _this.afterDel(_this.treeData,id);
+            const parent = node.parent;
+            const children = parent.data.children || parent.data;
+            const index = children.findIndex(d => d.id === id);
+            children.splice(index, 1);
           }
         })
       },
