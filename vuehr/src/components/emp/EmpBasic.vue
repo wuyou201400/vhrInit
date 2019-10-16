@@ -14,7 +14,8 @@
             prefix-icon="el-icon-search"
             v-model="keywords">
           </el-input>
-          <el-button type="primary" size="mini" style="margin-left: 5px" icon="el-icon-search" @click="searchEmp" v-show="!advanceSearchViewVisible">搜索
+          <el-button type="primary" size="mini" style="margin-left: 5px" icon="el-icon-search" @click="searchEmp"
+                     v-show="!advanceSearchViewVisible">搜索
           </el-button>
           <el-button slot="reference" type="primary" size="mini" style="margin-left: 5px"
                      @click="showAdvanceSearchView"><i
@@ -618,7 +619,7 @@
         politics: [],
         positions: [],
         joblevels: [],
-        pageSize:10,
+        pageSize: 10,
         totalCount: -1,
         currentPage: 1,
         degrees: [{id: 4, name: '大专'}, {id: 5, name: '本科'}, {id: 6, name: '硕士'}, {id: 7, name: '博士'}, {
@@ -749,6 +750,18 @@
       },
       beforeFileUpload(file) {
         this.fileUploadBtnText = '正在导入';
+        return;
+        const isJPG = file.type === 'image/xls' || file.type === 'image/xlsx';
+        const isLt2M = file.size / 1024 / 1024 < 20;
+        if (!isJPG) {
+          this.$message.error('请上传excel文件!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传文件大小不能超过 20MB!');
+        }
+        if (isJPG && isLt2M)
+          this.fileUploadBtnText = '正在导入';
+        return isJPG && isLt2M;
       },
       exportEmps() {
         window.open("/employee/basic/exportEmp", "_parent");
@@ -819,15 +832,15 @@
         this.currentPage = val;
         this.loadEmps();
       },
-      handleSizeChange(val){
+      handleSizeChange(val) {
         this.pageSize = val;
-        this.currentPage=1;
+        this.currentPage = 1;
         this.loadEmps();
       },
       loadEmps() {
         var _this = this;
         this.tableLoading = true;
-        this.getRequest("/employee/basic/emp?page=" + this.currentPage + "&size="+this.pageSize+"&keywords=" + this.keywords + "&politicId=" + this.emp.politicId + "&nationId=" + this.emp.nationId + "&posId=" + this.emp.posId + "&jobLevelId=" + this.emp.jobLevelId + "&engageForm=" + this.emp.engageForm + "&departmentId=" + this.emp.departmentId + "&beginDateScope=" + this.beginDateScope).then(resp => {
+        this.getRequest("/employee/basic/emp?page=" + this.currentPage + "&size=" + this.pageSize + "&keywords=" + this.keywords + "&politicId=" + this.emp.politicId + "&nationId=" + this.emp.nationId + "&posId=" + this.emp.posId + "&jobLevelId=" + this.emp.jobLevelId + "&engageForm=" + this.emp.engageForm + "&departmentId=" + this.emp.departmentId + "&beginDateScope=" + this.beginDateScope).then(resp => {
           this.tableLoading = false;
           if (resp && resp.status == 200) {
             var data = resp.data;
@@ -927,7 +940,7 @@
 //        delete this.emp.position;
 //        delete this.emp.nation;
 //        delete this.emp.politicsStatus;
-       delete this.emp.salary;
+        delete this.emp.salary;
         delete this.emp.workAge;
         delete this.emp.notWorkDate;
         this.dialogVisible = true;

@@ -24,8 +24,8 @@
       <!--注册弹窗数据-->
       <el-dialog title="注册" :visible.sync="dialogFormVisible">
         <el-form :model="regForm" :rules="regRules" ref="regForm" label-width="80px">
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="regForm.username" placeholder="用户名"></el-input>
+          <el-form-item label="登录名" prop="username">
+            <el-input v-model="regForm.username" placeholder="登录名"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
             <el-input type="password" v-model="regForm.password" placeholder="密码"></el-input>
@@ -36,8 +36,8 @@
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="regForm.email" placeholder="邮箱"></el-input>
           </el-form-item>
-          <el-form-item label="中文名称" prop="name">
-            <el-input v-model="regForm.name" placeholder="中文名称"></el-input>
+          <el-form-item label="姓名" prop="name">
+            <el-input v-model="regForm.name" placeholder="姓名"></el-input>
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
             <el-input v-model="regForm.phone" placeholder="手机号"></el-input>
@@ -52,12 +52,24 @@
             <el-input v-model="regForm.remark" placeholder="备注"></el-input>
           </el-form-item>
           <el-form-item label="头像" prop="userface">
-            <el-input v-model="regForm.userface" placeholder="头像"></el-input>
+            <el-upload
+              class="avatar-uploader"
+              action="/system/hr/upload"
+              accept="image/*"
+              :show-file-list="false"
+              :on-preview="handlePictureCardPreview"
+              :on-error="imgUploadError"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload">
+              <img v-if="regForm.userface" :src="regForm.userface" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="regClick">确 定</el-button>
+          <el-button type="info" @click="resetClick">重 置</el-button>
         </div>
       </el-dialog>
 
@@ -86,6 +98,40 @@
           callback();
         }
       };
+      var checkEmail = (rule, value, callback) => {
+        const mailReg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+        if (!value) {
+          return callback(new Error('邮箱不能为空'))
+        }
+        setTimeout(() => {
+          if (mailReg.test(value)) {
+            callback()
+          } else {
+            callback(new Error('请输入正确的邮箱格式'))
+          }
+        }, 100)
+      };
+      var checkPhone = (rule, value, callback) => {
+        const phoneReg = /^1[3|4|5|7|8][0-9]{9}$/
+        if (!value) {
+          return callback(new Error('电话号码不能为空'))
+        }
+        setTimeout(() => {
+          // Number.isInteger是es6验证数字是否为整数的方法,但是我实际用的时候输入的数字总是识别成字符串
+          // 所以我就在前面加了一个+实现隐式转换
+
+          if (!Number.isInteger(+value)) {
+            callback(new Error('请输入数字值'))
+          } else {
+            if (phoneReg.test(value)) {
+              callback()
+            } else {
+              callback(new Error('电话号码格式不正确'))
+            }
+          }
+        }, 100)
+      };
+
       return {
         rules: {
           username: [{required: true, message: '请输入用户名', trigger: 'blur'}],
@@ -127,11 +173,16 @@
             pattern: /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z\W_]+$)(?![a-z0-9]+$)(?![a-z\W_]+$)(?![0-9\W_]+$)[a-zA-Z0-9\W_]{6,30}$/,
             message: '密码为数字、字母、特殊符号，至少包含三种，长度为 6 - 30位'
           }],
-          password2: [{required: true, validator: validatePass2, trigger: 'blur'}]
+          password2: [{required: true, validator: validatePass2, trigger: 'blur'}],
+          email:[{required: true, message: '请输入邮箱', trigger: 'blur'},{ validator: checkEmail, trigger:'blur'}],
+          phone:[{required: true, message: '请输入手机号', trigger: 'blur'},{ validator: checkPhone, trigger: 'blur' }]
         }
       }
     },
     methods: {
+      resetClick:function(){
+        this.$refs['regForm'].resetFields();
+      },
       submitClick: function () {
         this.$refs['loginForm'].validate((valid) => {
           if (valid) {
@@ -164,7 +215,28 @@
 
           } else return false;
         })
+      },
+      handleAvatarSuccess(res, file) {
+        this.regForm.userface = URL.createObjectURL(file.raw);
+      },
+      beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return isJPG && isLt2M;
+      },
+      handlePictureCardPreview(file) {//预览图片时调用
+        this.regForm.userface = file.url;
+      },
+      imgUploadError(err, file, fileList){//图片上传失败调用
+        this.$message.error('上传图片失败!');
       }
+
     }
   }
 </script>
@@ -189,5 +261,29 @@
   .login_remember {
     margin: 0px 0px 35px 0px;
     text-align: left;
+  }
+/*注册-头像*/
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
   }
 </style>
