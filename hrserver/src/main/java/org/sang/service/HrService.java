@@ -42,6 +42,17 @@ public class HrService implements UserDetailsService {
         String encode = encoder.encode(password);
         return hrMapper.hrReg(username, encode);
     }
+    public int addHr(Hr hr)
+    {
+        //如果用户名存在，返回错误
+        if (hrMapper.loadUserByUsername(hr.getUsername()) != null) {
+            return -1;
+        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encode = encoder.encode(hr.getPassword());
+        hr.setPassword(encode);
+        return hrMapper.addHr(hr);
+    }
 
     public List<Hr> getHrsByKeywords(String keywords) {
         return hrMapper.getHrsByKeywords(keywords);

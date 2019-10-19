@@ -35,6 +35,9 @@
     <insert id="hrReg">
         INSERT INTO hr set username=#{username},password=#{password}
     </insert>
+    <insert id="addHr" parameterType="org.sang.bean.Hr">
+        INSERT INTO hr set username=#{username},password=#{password},name=#{name},phone=#{phone},telephone=#{telephone},address=#{address},enabled=1,userface=#{userface},remark=#{remark},email=#{email}
+    </insert>
     <select id="getHrsByKeywords" resultMap="eagerLoadRoles">
         select h.*,`r`.`id` AS `rid`,`r`.`name` AS `rname`,`r`.`nameZh` AS `rnameZh` from ((`hr` `h` left join `hr_role`
         `h_r` on ((`h`.`id` = `h_r`.`hrid`))) left join `role` `r` on ((`h_r`.`rid` = `r`.`id`)))

@@ -22,54 +22,75 @@
       </el-form>
 
       <!--注册弹窗数据-->
-      <el-dialog title="注册" :visible.sync="dialogFormVisible">
+      <el-dialog title="注册" :visible.sync="dialogFormVisible" v-loading="regloading">
         <el-form :model="regForm" :rules="regRules" ref="regForm" label-width="80px">
-          <el-form-item label="登录名" prop="username">
-            <el-input v-model="regForm.username" placeholder="登录名"></el-input>
-          </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input type="password" v-model="regForm.password" placeholder="密码"></el-input>
-          </el-form-item>
-          <el-form-item label="确认密码" prop="password2">
-            <el-input type="password" v-model="regForm.password2" placeholder="确认密码"></el-input>
-          </el-form-item>
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="regForm.email" placeholder="邮箱"></el-input>
-          </el-form-item>
-          <el-form-item label="姓名" prop="name">
-            <el-input v-model="regForm.name" placeholder="姓名"></el-input>
-          </el-form-item>
-          <el-form-item label="手机号" prop="phone">
-            <el-input v-model="regForm.phone" placeholder="手机号"></el-input>
-          </el-form-item>
-          <el-form-item label="座机" prop="telephone">
-            <el-input v-model="regForm.telephone" placeholder="座机"></el-input>
-          </el-form-item>
-          <el-form-item label="地址" prop="address">
-            <el-input v-model="regForm.address" placeholder="地址"></el-input>
-          </el-form-item>
-          <el-form-item label="备注" prop="remark">
-            <el-input v-model="regForm.remark" placeholder="备注"></el-input>
-          </el-form-item>
-          <el-form-item label="头像" prop="userface">
-            <el-upload
-              class="avatar-uploader"
-              action="/system/hr/upload"
-              accept="image/*"
-              :show-file-list="false"
-              :on-preview="handlePictureCardPreview"
-              :on-error="imgUploadError"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload">
-              <img v-if="regForm.userface" :src="regForm.userface" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-          </el-form-item>
+          <el-row type="flex" class="row-bg">
+            <el-col :span="12">
+              <el-form-item label="登录名" prop="username">
+                <el-input v-model="regForm.username" placeholder="登录名"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-form-item label="姓名" prop="name">
+              <el-input v-model="regForm.name" placeholder="姓名"></el-input>
+            </el-form-item>
+          </el-row>
+          <el-row type="flex" class="row-bg">
+            <el-col :span="12">
+              <el-form-item label="密码" prop="password">
+                <el-input type="password" v-model="regForm.password" placeholder="密码"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-form-item label="确认密码" prop="password2">
+              <el-input type="password" v-model="regForm.password2" placeholder="确认密码"></el-input>
+            </el-form-item>
+          </el-row>
+          <el-row type="flex" class="row-bg">
+            <el-col :span="12">
+              <el-form-item label="手机号" prop="phone">
+                <el-input v-model="regForm.phone" placeholder="手机号"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-form-item label="邮箱" prop="email">
+              <el-input v-model="regForm.email" placeholder="邮箱"></el-input>
+            </el-form-item>
+          </el-row>
+          <el-collapse v-model="activeName" accordion>
+            <el-collapse-item title="其他信息" name="1">
+              <el-row type="flex" class="row-bg">
+                <el-col :span="12">
+                  <el-form-item label="座机" prop="telephone">
+                    <el-input v-model="regForm.telephone" placeholder="座机"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-form-item label="地址" prop="address">
+                  <el-input v-model="regForm.address" placeholder="地址"></el-input>
+                </el-form-item>
+              </el-row>
+              <el-form-item label="备注" prop="remark">
+                <el-input v-model="regForm.remark" placeholder="备注"></el-input>
+              </el-form-item>
+              <el-form-item label="头像" prop="userface">
+                <el-upload
+                  class="avatar-uploader"
+                  action="/system/hr/userface"
+                  accept="image/*"
+                  :show-file-list="false"
+                  :on-preview="handlePictureCardPreview"
+                  :on-error="imgUploadError"
+                  :on-success="handleAvatarSuccess"
+                  :before-upload="beforeAvatarUpload">
+                  <img v-if="regForm.userface" :src="regForm.userface" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+              </el-form-item>
+            </el-collapse-item>
+          </el-collapse>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="regClick">确 定</el-button>
           <el-button type="info" @click="resetClick">重 置</el-button>
+          <el-button type="primary" @click="regClick">确 定</el-button>
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+
         </div>
       </el-dialog>
 
@@ -145,6 +166,8 @@
         loading: false,
         //注册相关
         dialogFormVisible: false,
+        regloading: false,
+        activeName: '',
         regForm: {
           id: '',
           name: '',
@@ -174,13 +197,14 @@
             message: '密码为数字、字母、特殊符号，至少包含三种，长度为 6 - 30位'
           }],
           password2: [{required: true, validator: validatePass2, trigger: 'blur'}],
-          email:[{required: true, message: '请输入邮箱', trigger: 'blur'},{ validator: checkEmail, trigger:'blur'}],
-          phone:[{required: true, message: '请输入手机号', trigger: 'blur'},{ validator: checkPhone, trigger: 'blur' }]
+          email: [{required: true, message: '请输入邮箱', trigger: 'blur'}, {validator: checkEmail, trigger: 'blur'}],
+          phone: [{required: true, message: '请输入手机号', trigger: 'blur'}, {validator: checkPhone, trigger: 'blur'}],
+          name: [{required: true, message: '请输入姓名', trigger: 'blur'}]
         }
       }
     },
     methods: {
-      resetClick:function(){
+      resetClick: function () {
         this.$refs['regForm'].resetFields();
       },
       submitClick: function () {
@@ -212,12 +236,24 @@
       regClick: function () {
         this.$refs['regForm'].validate((valid) => {
           if (valid) {
-
-          } else return false;
+            var _this = this;
+            this.regloading = true;
+            this.postRequest("/system/hr/reg", this.regForm).then(resp => {
+              _this.regloading = false;
+              if (resp && resp.status == 200) {
+                _this.dialogFormVisible = !_this.dialogFormVisible;
+                _this.loginForm.username = _this.regForm.username;
+                _this.loginForm.password = _this.regForm.password;
+              }
+            })
+          } else {
+            return false;
+          }
         })
       },
       handleAvatarSuccess(res, file) {
-        this.regForm.userface = URL.createObjectURL(file.raw);
+        // this.regForm.userface = URL.createObjectURL(file.raw);
+        this.regForm.userface = res.msg;
       },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg';
@@ -233,7 +269,7 @@
       handlePictureCardPreview(file) {//预览图片时调用
         this.regForm.userface = file.url;
       },
-      imgUploadError(err, file, fileList){//图片上传失败调用
+      imgUploadError(err, file, fileList) {//图片上传失败调用
         this.$message.error('上传图片失败!');
       }
 
@@ -262,7 +298,8 @@
     margin: 0px 0px 35px 0px;
     text-align: left;
   }
-/*注册-头像*/
+
+  /*注册-头像*/
   .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
@@ -270,9 +307,11 @@
     position: relative;
     overflow: hidden;
   }
+
   .avatar-uploader .el-upload:hover {
     border-color: #409EFF;
   }
+
   .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
@@ -281,6 +320,7 @@
     line-height: 178px;
     text-align: center;
   }
+
   .avatar {
     width: 178px;
     height: 178px;

@@ -72,7 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override //WEB安全
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/index.html", "/static/**", "/login_p", "/favicon.ico");
+        web.ignoring().antMatchers("/index.html", "/static/**", "/login_p", "/favicon.ico","/system/hr/userface","/userface/**","/system/hr/reg");
     }
 
     @Override  //HTTP请求安全处理

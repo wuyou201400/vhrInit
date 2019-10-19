@@ -6,6 +6,8 @@ import org.sang.bean.Role;
 import org.sang.service.HrService;
 import org.sang.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,7 +19,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.io.File;
+import java.util.Random;
 
 /**
  * Created by sang on 2018/1/2.
@@ -81,24 +87,60 @@ public class SystemHrController {
         return RespBean.error("注册失败!");
     }
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String upload(MultipartFile file) throws SocketException, IOException {
+    @RequestMapping(value = "/reg", method = RequestMethod.POST)
+    public RespBean hrReg(Hr hr) {
+        int i = hrService.addHr(hr);
+        if (i == 1) {
+            return RespBean.ok("注册成功!");
+        } else if (i == -1) {
+            return RespBean.error("用户名重复，注册失败!");
+        }
+        return RespBean.error("注册失败!");
+    }
+
+    @RequestMapping(value = "/userface", method = RequestMethod.POST)
+    public RespBean uploadUserface(MultipartFile file) throws SocketException, IOException {
+        //返回上传的文件是否为空，即没有选择任何文件，或者所选文件没有内容。
+        //防止上传空文件导致奔溃
+        if (file.isEmpty()) {
+            throw new NullPointerException("文件为空");
+        }
         // 获取文件名
         String fileName = file.getOriginalFilename();
-        // 在file文件夹中创建名为fileName的文件
-        OutputStreamWriter op = new OutputStreamWriter(new FileOutputStream("./file/" + fileName), "UTF-8");
-        // 获取文件输入流
-        InputStreamReader inputStreamReader = new InputStreamReader(file.getInputStream());
-        char[] bytes = new char[12];
-        // 如果这里的bytes不是数组，则每次只会读取一个字节，例如test会变成 t   e     s    t
-        while (inputStreamReader.read(bytes) != -1){
-            op.write(bytes);
+        //为防止文件重名被覆盖，文件名取名为：当前日期-1-1000内随机数-原始文件名
+        Random random = new Random();
+        Integer randomFileName = random.nextInt(1000);
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHH");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMddHHmmss");
+        fileName = sdf2.format(d) +"-"+ randomFileName+"-"+fileName;
+
+        //获取项目classes/static的地址
+        String path = ClassUtils.getDefaultClassLoader().getResource("static").getPath();
+        //图片访问URI(即除了协议、地址和端口号的URL)
+        String url_path = "userface"+File.separator+sdf.format(d)+File.separator+fileName;
+        String savePath = path+File.separator+url_path;  //图片保存路径
+        File saveFile = new File(savePath);
+        if (!saveFile.getParentFile().exists()){
+            saveFile.getParentFile().mkdirs();
         }
-        // 关闭输出流
-        op.close();
-        // 关闭输入流
-        inputStreamReader.close();
-        return "上传成功";
+
+ /*       File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        if(!path.exists()) path = new File("");
+        String savePath=path.getAbsolutePath(),"static/images/userface/";
+        File upload = new File(savePath);
+        if(!upload.exists()) upload.mkdirs();*/
+
+        try {
+            file.transferTo(saveFile);  //将临时存储的文件移动到真实存储路径下
+        } catch (IOException e) {
+            e.printStackTrace();
+            return RespBean.error("保存失败");
+        }
+        return RespBean.ok(url_path);
+
     }
+
+
 
 }
