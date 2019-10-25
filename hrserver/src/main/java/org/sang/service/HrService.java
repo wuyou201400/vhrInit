@@ -84,5 +84,9 @@ public class HrService implements UserDetailsService {
     public int updateUserEmail(String email) {
         return hrMapper.updateUserEmail(email, Util.getCurrentUser().getId());
     }
+    public int updateUserface(String userface,Long id)
+    {
+        return hrMapper.updateUserface(userface,id);
+    }
 
 }

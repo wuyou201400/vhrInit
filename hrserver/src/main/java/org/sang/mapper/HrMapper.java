@@ -33,4 +33,5 @@ public interface HrMapper {
     List<Hr> getAllHr(@Param("currentId") Long currentId);
 
     int updateUserEmail(@Param("email") String email, @Param("id") Long id);
+    int updateUserface(@Param("userface") String userface,@Param("id") Long id);
 }

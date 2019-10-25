@@ -3,6 +3,7 @@ package org.sang.controller.system;
 import org.sang.bean.Hr;
 import org.sang.bean.RespBean;
 import org.sang.bean.Role;
+import org.sang.mapper.HrMapper;
 import org.sang.service.HrService;
 import org.sang.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ public class SystemHrController {
         return hrs;
     }
 
-    @RequestMapping(value = "/roles",method = RequestMethod.GET)
+    @RequestMapping(value = "/roles", method = RequestMethod.GET)
     public List<Role> allRoles() {
         return roleService.getRolesByHrid();
     }
@@ -100,6 +101,22 @@ public class SystemHrController {
 
     @RequestMapping(value = "/userface", method = RequestMethod.POST)
     public RespBean uploadUserface(MultipartFile file) throws SocketException, IOException {
+        return SaveUserfaceFile(file);
+    }
+
+    @RequestMapping(value = "/changeUserface", method = RequestMethod.POST)
+    public RespBean changeUserface(MultipartFile file, Long id) throws SocketException, IOException {
+        RespBean savefile = SaveUserfaceFile(file);
+        if (savefile.getStatus() != 200)
+            return savefile;
+        int effectrows = hrService.updateUserface(savefile.getMsg(), id);
+        if (effectrows == 1)
+            return savefile;
+        else
+            return RespBean.error("保存失败!");
+    }
+
+    private RespBean SaveUserfaceFile(MultipartFile file) {
         //返回上传的文件是否为空，即没有选择任何文件，或者所选文件没有内容。
         //防止上传空文件导致奔溃
         if (file.isEmpty()) {
@@ -113,15 +130,15 @@ public class SystemHrController {
         Date d = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHH");
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMddHHmmss");
-        fileName = sdf2.format(d) +"-"+ randomFileName+"-"+fileName;
+        fileName = sdf2.format(d) + "-" + randomFileName + "-" + fileName;
 
         //获取项目classes/static的地址
         String path = ClassUtils.getDefaultClassLoader().getResource("static").getPath();
         //图片访问URI(即除了协议、地址和端口号的URL)
-        String url_path = "userface"+File.separator+sdf.format(d)+File.separator+fileName;
-        String savePath = path+File.separator+url_path;  //图片保存路径
+        String url_path = "userface" + File.separator + sdf.format(d) + File.separator + fileName;
+        String savePath = path + File.separator + url_path;  //图片保存路径
         File saveFile = new File(savePath);
-        if (!saveFile.getParentFile().exists()){
+        if (!saveFile.getParentFile().exists()) {
             saveFile.getParentFile().mkdirs();
         }
 
@@ -140,7 +157,4 @@ public class SystemHrController {
         return RespBean.ok(url_path);
 
     }
-
-
-
 }

@@ -42,7 +42,7 @@
         select h.*,`r`.`id` AS `rid`,`r`.`name` AS `rname`,`r`.`nameZh` AS `rnameZh` from ((`hr` `h` left join `hr_role`
         `h_r` on ((`h`.`id` = `h_r`.`hrid`))) left join `role` `r` on ((`h_r`.`rid` = `r`.`id`)))
         <if test="keywords!='all' and keywords!=''">
-            and h.`name` like concat('%',#{keywords},'%')
+            where h.`name` like concat('%',#{keywords},'%')
         </if>
 
     </select>
@@ -103,5 +103,8 @@
     </select>
     <update id="updateUserEmail">
         UPDATE hr set email=#{email} WHERE id=#{id}
+    </update>
+    <update id="updateUserface">
+        UPDATE hr set userface=#{userface} WHERE id=#{id}
     </update>
 </mapper>

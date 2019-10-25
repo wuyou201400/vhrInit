@@ -21,7 +21,21 @@
         </div>
         <div>
           <div style="width: 100%;display: flex;justify-content: center">
-            <img :src="item.userface" alt="item.name" style="width: 70px;height: 70px;border-radius: 70px">
+            <!--<img :src="item.userface" alt="item.name" style="width: 70px;height: 70px;border-radius: 70px">-->
+            <el-upload
+              class="avatar-uploader"
+              action="/system/hr/changeUserface"
+              accept="image/*"
+              :data="{id:item.id}"
+              :show-file-list="false"
+              :on-preview="(res,file)=>{return handlePictureCardPreview(res,file, index)}"
+              :on-error="imgUploadError"
+              :on-success="(res,file)=>{return handleAvatarSuccess(res,file,index)}"
+              :before-upload="beforeAvatarUpload">
+              <img v-if="item.userface" :src="item.userface" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              <div slot="tip" class="el-upload__tip">只能上传jpg文件，且不超过2Mb</div>
+            </el-upload>
           </div>
           <div style="margin-top: 20px">
             <div><span class="user-info">用户名:{{item.name}}</span></div>
@@ -69,8 +83,8 @@
                 </el-select>
                 <el-button type="text" icon="el-icon-more" style="color: #09c0f6;padding-top: 0px" slot="reference"
                            @click="loadSelRoles(item.roles,index)" :disabled="moreBtnState"></el-button>
-<!--                <i class="el-icon-more" style="color: #09c0f6;cursor: pointer" slot="reference"
-                   @click="loadSelRoles(item.roles,index)" disabled="true"></i>-->
+                <!--                <i class="el-icon-more" style="color: #09c0f6;cursor: pointer" slot="reference"
+                                   @click="loadSelRoles(item.roles,index)" disabled="true"></i>-->
               </el-popover>
             </div>
             <div><span class="user-info">备注:{{item.remark}}</span></div>
@@ -81,8 +95,8 @@
   </div>
 </template>
 <script>
-  export default{
-    data(){
+  export default {
+    data() {
       return {
         keywords: '',
         fullloading: false,
@@ -90,22 +104,22 @@
         cardLoading: [],
         eploading: [],
         allRoles: [],
-        moreBtnState:false,
+        moreBtnState: false,
         selRoles: [],
-        selRolesBak: []
+        selRolesBak: [],
+        currentId: ''
       }
     },
     mounted: function () {
-      debugger
       this.initCards();
       this.loadAllRoles();
     },
     methods: {
-      searchClick(){
+      searchClick() {
         this.initCards();
         this.loadAllRoles();
       },
-      updateHrRoles(hrId, index){
+      updateHrRoles(hrId, index) {
         this.moreBtnState = false;
         var _this = this;
         if (this.selRolesBak.length == this.selRoles.length) {
@@ -125,7 +139,7 @@
         this.putRequest("/system/hr/roles", {
           hrId: hrId,
           rids: this.selRoles
-        }).then(resp=> {
+        }).then(resp => {
           _this.eploading.splice(index, 1, false);
           if (resp && resp.status == 200) {
             var data = resp.data;
@@ -136,39 +150,39 @@
           }
         });
       },
-      refreshHr(hrId, index){
+      refreshHr(hrId, index) {
         var _this = this;
         _this.cardLoading.splice(index, 1, true)
-        this.putRequest("/system/hr/id/" + hrId).then(resp=> {
+        this.putRequest("/system/hr/id/" + hrId).then(resp => {
           _this.cardLoading.splice(index, 1, false)
           _this.hrs.splice(index, 1, resp.data);
         })
       },
-      loadSelRoles(hrRoles, index){
+      loadSelRoles(hrRoles, index) {
         this.moreBtnState = true;
         this.selRoles = [];
         this.selRolesBak = [];
-        hrRoles.forEach(role=> {
+        hrRoles.forEach(role => {
           this.selRoles.push(role.id)
           this.selRolesBak.push(role.id)
         })
       },
-      loadAllRoles(){
+      loadAllRoles() {
         var _this = this;
-        this.getRequest("/system/hr/roles").then(resp=> {
+        this.getRequest("/system/hr/roles").then(resp => {
           _this.fullloading = false;
           if (resp && resp.status == 200) {
             _this.allRoles = resp.data;
           }
         })
       },
-      switchChange(newValue, hrId, index){
+      switchChange(newValue, hrId, index) {
         var _this = this;
         _this.cardLoading.splice(index, 1, true)
         this.putRequest("/system/hr/", {
           enabled: newValue,
           id: hrId
-        }).then(resp=> {
+        }).then(resp => {
           _this.cardLoading.splice(index, 1, false)
           if (resp && resp.status == 200) {
             var data = resp.data;
@@ -181,7 +195,7 @@
           }
         })
       },
-      initCards(){
+      initCards() {
         this.fullloading = true;
         var _this = this;
         var searchWords;
@@ -190,7 +204,7 @@
         } else {
           searchWords = this.keywords;
         }
-        this.getRequest("/system/hr/" + searchWords).then(resp=> {
+        this.getRequest("/system/hr/" + searchWords).then(resp => {
           if (resp && resp.status == 200) {
             _this.hrs = resp.data;
             var length = resp.data.length;
@@ -203,20 +217,49 @@
           }
         })
       },
-      deleteHr(hrId){
+      deleteHr(hrId) {
         var _this = this;
-        this.fullloading = true;
-        this.deleteRequest("/system/hr/" + hrId).then(resp=> {
-          _this.fullloading = false;
-          if (resp && resp.status == 200) {
-            var data = resp.data;
+        this.$confirm('确定删除该用户吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.fullloading = true;
+          this.deleteRequest("/system/hr/" + hrId).then(resp => {
+            _this.fullloading = false;
+            if (resp && resp.status == 200) {
+              var data = resp.data;
 
-            if (data.status == 'success') {
-              _this.initCards();
-              _this.loadAllRoles();
+              if (data.status == 'success') {
+                _this.initCards();
+                _this.loadAllRoles();
+              }
             }
-          }
+          })
         })
+      },
+      //头像
+      handleAvatarSuccess(res, file, index) {
+        // this.regForm.userface = URL.createObjectURL(file.raw);
+        this.hrs[index].userface = res.msg;
+      },
+      beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+
+        return isJPG && isLt2M;
+      },
+      handlePictureCardPreview(file, index) {//预览图片时调用
+        this.hrs[index].userface = file.url;
+      },
+      imgUploadError(err, file, fileList) {//图片上传失败调用
+        this.$message.error('上传图片失败!');
       }
     }
   }
@@ -225,5 +268,33 @@
   .user-info {
     font-size: 12px;
     color: #09c0f6;
+  }
+
+  /*注册-头像*/
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
   }
 </style>
