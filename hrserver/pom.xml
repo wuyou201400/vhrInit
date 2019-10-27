@@ -110,6 +110,22 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <!-- 1、设置jar的入口类 -->
+            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.6</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                        <classpathPrefix>target/</classpathPrefix>
+                        <mainClass>org.sang.HrserverApplication</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
