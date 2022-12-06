@@ -15,7 +15,7 @@
     "element-ui": "^2.12.0",
     "font-awesome": "^4.7.0",
     "mavon-editor": "^2.7.6",
-    "qs": "^6.9.0",
+    "qs": "^6.9.7",
     "vue": "^2.6.10",
     "vue-echarts": "^4.0.4",
     "vue-router": "^3.0.1",
